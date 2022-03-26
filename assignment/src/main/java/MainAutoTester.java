@@ -1,160 +1,71 @@
 import java.util.ArrayList;
 
-enum LogicOperator {
-    AND,
-    OR
-}
-
-class OperationIndex {
-    int operationId;
-    LogicOperator operator;
-
-    OperationIndex(int operationId, LogicOperator operator) {
-        this.operationId = operationId;
-        this.operator = operator;
-    }
-}
-
-class Decision {
-    Decision leftSide;
-    Decision rightSide;
-
-    Operation leftSideO;
-    Operation rightSideO;
-
-}
-
-/// ( x <= y || x >= z ) && ( x <= 10 || (x >= 50 && x != -1000))
+// (a <= b && a <= c) || (a >= b && a >= c)
+// (a <= b && a <= c) || (a >= b && a >= c && a != 0)
 
 public class MainAutoTester {
-    ArrayList<Operation> operations = new ArrayList<>();
-    ArrayList<OperationIndex> operationIndices = new ArrayList<>();
+
+    Operation op1 = new Operation("a", "b", Condition.LTOET);
+    Operation op2 = new Operation("a", "c", Condition.LTOET);
+    Operation op3 = new Operation("a", "b", Condition.GTOET);
+    Operation op4 = new Operation("a", "c", Condition.GTOET);
+    Operation op5 = new Operation("a", "0", Condition.NOTEQUAL);
+
+    public boolean calculateState(BranchPredicate bp) {
+        boolean result;
+
+        result = bp.mainOperator != LogicOperator.OR;
+
+        for (LogicOperation logicOperation : bp.logicOperations) {
+            boolean x = logicOperation.operations.get(0).state;
+
+            for (Operation operation : logicOperation.operations) {
+                if (logicOperation.operator == LogicOperator.OR) {
+                    x = x || operation.state;
+                } else if (logicOperation.operator == LogicOperator.AND) {
+                    x = x && operation.state;
+                }
+            }
 
 
-    public void addOperations() {
-        Operation op1 = new Operation("x", "y", Condition.LTOET);
-        Operation op2 = new Operation("x", "z", Condition.GTOET);
-        Operation op3 = new Operation("x", "10", Condition.LTOET);
-
-        op1.state = true;
-        op2.state = false;
-        op3.state = false;
-
-        OperationIndex i1 = new OperationIndex(1, LogicOperator.OR);
-        OperationIndex i2 = new OperationIndex(2, LogicOperator.AND);
-
-        operations.add(op1);
-        operations.add(op2);
-        operations.add(op3);
-
-        operationIndices.add(i1);
-        operationIndices.add(i2);
-    }
-
-    void calculateLogicalOperation(ArrayList<Operation> operations, ArrayList<OperationIndex> operationIndices) {
-        boolean result = operations.get(0).state;
-
-        for(OperationIndex op : operationIndices) {
-            switch (op.operator) {
-                case OR:
-                    result = result || operations.get(op.operationId).state;
-                    break;
-                case AND:
-                    result = result && operations.get(op.operationId).state;
-                    break;
+            if (bp.mainOperator == LogicOperator.OR) {
+                result = result || x;
+            } else if (bp.mainOperator == LogicOperator.AND) {
+                result = result && x;
             }
         }
 
-        System.out.println(result);
+        return result;
     }
 
     public static void main(String[] args) {
         MainAutoTester m = new MainAutoTester();
-        m.addOperations();
-        m.calculateLogicalOperation(m.operations, m.operationIndices);
+
+        ArrayList<Operation> arrayOp1 = new ArrayList<>();
+        ArrayList<Operation> arrayOp2 = new ArrayList<>();
+
+        m.op1.state = false;
+        m.op2.state = true;
+        m.op3.state = true;
+        m.op4.state = true;
+        m.op5.state = true;
+
+        arrayOp1.add(m.op1);
+        arrayOp1.add(m.op2);
+        arrayOp2.add(m.op3);
+        arrayOp2.add(m.op4);
+        arrayOp2.add(m.op5);
+
+        LogicOperation logicOperation1 = new LogicOperation(arrayOp1, LogicOperator.AND);
+        LogicOperation logicOperation2 = new LogicOperation(arrayOp2, LogicOperator.AND);
+
+        ArrayList<LogicOperation> logicOperations = new ArrayList<>();
+        logicOperations.add(logicOperation1);
+        logicOperations.add(logicOperation2);
+
+        BranchPredicate bp = new BranchPredicate(logicOperations, LogicOperator.OR);
+
+        System.out.println(m.calculateState(bp));
     }
 
 }
-//
-//class BranchPredicate {
-//    ArrayList<LogicalOperation> predicates;
-//    LogicalAndOrNot mainLogicalOperator;
-//
-//    LogicalOperation logicalOperation;
-//
-//    BranchPredicate(ArrayList<LogicalOperation> predicate, LogicalAndOrNot mlo) {
-//        this.predicates = predicate;
-//        this.mainLogicalOperator = mlo;
-//    }
-//
-//    BranchPredicate(LogicalOperation logicalOperation) {
-//        this.logicalOperation = logicalOperation;
-//    }
-//
-//    @Override
-//    public String toString() {
-//
-//        if (predicates == null) {
-//            return logicalOperation.toString();
-//        }
-//
-//        String stringOp = "";
-//        String returnString = "";
-//
-//        switch (mainLogicalOperator) {
-//            case OR:
-//                stringOp = "||";
-//                break;
-//            case AND:
-//                stringOp = "&&";
-//                break;
-//            case NOT:
-//                stringOp = "!";
-//                break;
-//        }
-//
-//        for (int i = 0; i < predicates.size(); i++) {
-//            if (i != predicates.size() - 1) {
-//                returnString = returnString + predicates.get(i).toString() + " " + stringOp + " ";
-//            } else {
-//                returnString = returnString + predicates.get(i).toString();
-//            }
-//        }
-//
-//        return returnString;
-//    }
-//}
-//
-//public class MainAutoTester {
-//
-//    public static void main(String[] args) {
-//
-//        // TEST DATA - Testing a single predicate
-//        // Predicate tested: (x <= y) || (x <= z)
-//        // x <= y -- firstOperation
-//        // x <= z -- secondOperation
-//
-//        Operation firstOperation = new Operation("x", "y", Condition.LTOET);
-//        Operation secondOperation = new Operation("x", "z", Condition.LTOET);
-//
-//        Operation thirdOperation = new Operation("x", "y", Condition.LTOET);
-//        Operation fourthOperation = new Operation("x", "z", Condition.LTOET);
-//
-//        LogicalAndOrNot op = LogicalAndOrNot.OR;
-//
-//        LogicalOperation logicalOperation = new LogicalOperation(firstOperation, secondOperation, op);
-//        LogicalOperation logicalOperation2 = new LogicalOperation(firstOperation, secondOperation, op);
-//        LogicalOperation logicalOperation3 = new LogicalOperation(firstOperation, secondOperation, op);
-//
-//        ArrayList<LogicalOperation> array = new ArrayList<LogicalOperation>();
-//        array.add(logicalOperation);
-//        array.add(logicalOperation2);
-//
-//        BranchPredicate branchPredicate = new BranchPredicate(array, LogicalAndOrNot.AND);
-//
-//        System.out.println(branchPredicate);
-//
-//
-//    }
-//
-//}
