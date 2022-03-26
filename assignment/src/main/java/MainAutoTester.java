@@ -57,7 +57,29 @@ public class MainAutoTester {
         System.out.println();
     }
 
-    public void getMCDCTestRequirements(BranchPredicate bp) {
+    public ArrayList<Boolean> getOperationStates(BranchPredicate bp) {
+        ArrayList<Boolean> returnList = new ArrayList<Boolean>();
+        for (LogicOperation logicOperation : bp.logicOperations) {
+            for (Operation operation : logicOperation.operations)  {
+                returnList.add(operation.state);
+            }
+        }
+
+        return returnList;
+    }
+
+    public boolean checkTestRequirementUnique(ArrayList<ArrayList<Boolean>> checkList, ArrayList<Boolean> list) {
+        for (ArrayList<Boolean> l : checkList) {
+            if (list.equals(l)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public ArrayList<ArrayList<Boolean>> getMCDCTestRequirements(BranchPredicate bp) {
+
+        ArrayList<ArrayList<Boolean>> returnList = new ArrayList<>();
 
         for (LogicOperation logicOperation : bp.logicOperations) {
 
@@ -80,13 +102,19 @@ public class MainAutoTester {
 
                 if (result1 != result2) {
                     operation.state = !s;
-                    printOperationsStatesBranch(bp);
+                    ArrayList<Boolean> requirements = getOperationStates(bp);
+                    if (checkTestRequirementUnique(returnList, requirements)) {
+                        returnList.add(requirements);
+                    }
                     operation.state = s;
-                    printOperationsStatesBranch(bp);
+                    requirements = getOperationStates(bp);
+                    if (checkTestRequirementUnique(returnList, requirements)) {
+                        returnList.add(requirements);
+                    }
                 }
             }
-
         }
+        return returnList;
     }
 
     public static void main(String[] args) {
@@ -117,7 +145,7 @@ public class MainAutoTester {
         BranchPredicate bp = new BranchPredicate(logicOperations, LogicOperator.AND);
 
         //System.out.println(m.calculateState(bp));
-        m.getMCDCTestRequirements(bp);
+        System.out.println(m.getMCDCTestRequirements(bp));
     }
 
 }
