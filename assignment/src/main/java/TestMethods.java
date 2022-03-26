@@ -3,11 +3,7 @@ public class TestMethods {
     /// COMPLICATED PREDICATE EXAMPLE
 
     public static boolean test1(int a, int b, int c) {
-        if ((a <= b && a <= c) || (a >= b && a >= c)) {
-            return  true;
-        }
-
-        return false;
+        return (a <= b && a <= c) || (a >= b && a >= c);
     }
 
 

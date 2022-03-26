@@ -38,6 +38,57 @@ public class MainAutoTester {
         return result;
     }
 
+    public void setStartingStateOperations(BranchPredicate bp) {
+        boolean state = bp.mainOperator != LogicOperator.OR;
+
+        for (LogicOperation logicOperation : bp.logicOperations) {
+            for (Operation operation : logicOperation.operations)  {
+                operation.state = state;
+            }
+        }
+    }
+
+    public void printOperationsStatesBranch(BranchPredicate bp) {
+        for (LogicOperation logicOperation : bp.logicOperations) {
+            for (Operation operation : logicOperation.operations)  {
+                System.out.print(operation.state + " ");
+            }
+        }
+        System.out.println();
+    }
+
+    public void getMCDCTestRequirements(BranchPredicate bp) {
+
+        for (LogicOperation logicOperation : bp.logicOperations) {
+
+            boolean s = logicOperation.operator != LogicOperator.OR;
+
+            for (Operation operation : logicOperation.operations) {
+                setStartingStateOperations(bp);
+
+                for (Operation op : logicOperation.operations) {
+                    if (!operation.equals(op)) {
+                        op.state = s;
+                    }
+                }
+
+                operation.state = !s;
+                boolean result1 = calculateState(bp);
+
+                operation.state = !operation.state;
+                boolean result2 = calculateState(bp);
+
+                if (result1 != result2) {
+                    operation.state = !s;
+                    printOperationsStatesBranch(bp);
+                    operation.state = s;
+                    printOperationsStatesBranch(bp);
+                }
+            }
+
+        }
+    }
+
     public static void main(String[] args) {
         MainAutoTester m = new MainAutoTester();
 
@@ -54,18 +105,19 @@ public class MainAutoTester {
         arrayOp1.add(m.op2);
         arrayOp2.add(m.op3);
         arrayOp2.add(m.op4);
-        arrayOp2.add(m.op5);
+        //arrayOp2.add(m.op5);
 
-        LogicOperation logicOperation1 = new LogicOperation(arrayOp1, LogicOperator.AND);
-        LogicOperation logicOperation2 = new LogicOperation(arrayOp2, LogicOperator.AND);
+        LogicOperation logicOperation1 = new LogicOperation(arrayOp1, LogicOperator.OR);
+        LogicOperation logicOperation2 = new LogicOperation(arrayOp2, LogicOperator.OR);
 
         ArrayList<LogicOperation> logicOperations = new ArrayList<>();
         logicOperations.add(logicOperation1);
         logicOperations.add(logicOperation2);
 
-        BranchPredicate bp = new BranchPredicate(logicOperations, LogicOperator.OR);
+        BranchPredicate bp = new BranchPredicate(logicOperations, LogicOperator.AND);
 
-        System.out.println(m.calculateState(bp));
+        //System.out.println(m.calculateState(bp));
+        m.getMCDCTestRequirements(bp);
     }
 
 }

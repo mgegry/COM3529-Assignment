@@ -7,18 +7,6 @@ enum Condition {
     LESSTHAN,
 }
 
-/*
-    array operation[]
-    array operationOrder[] - operation order
-
-    operationOrder {
-        index operationTerm
-        logicalOperator
-    }
-
-    (a || b) && c
- */
-
 class Operation {
     String leftSide;
     String rightSide;
