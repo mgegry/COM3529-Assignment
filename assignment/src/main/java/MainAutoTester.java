@@ -1,15 +1,10 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 // (a <= b && a <= c) || (a >= b && a >= c)
 // (a <= b && a <= c) || (a >= b && a >= c && a != 0)
 
 public class MainAutoTester {
-
-    Operation op1 = new Operation("a", "b", Condition.LTOET);
-    Operation op2 = new Operation("a", "c", Condition.LTOET);
-    Operation op3 = new Operation("a", "b", Condition.GTOET);
-    Operation op4 = new Operation("a", "c", Condition.GTOET);
-    Operation op5 = new Operation("a", "0", Condition.NOTEQUAL);
 
     public boolean calculateState(BranchPredicate bp) {
         boolean result;
@@ -58,7 +53,7 @@ public class MainAutoTester {
     }
 
     public ArrayList<Boolean> getOperationStates(BranchPredicate bp) {
-        ArrayList<Boolean> returnList = new ArrayList<Boolean>();
+        ArrayList<Boolean> returnList = new ArrayList<>();
         for (LogicOperation logicOperation : bp.logicOperations) {
             for (Operation operation : logicOperation.operations)  {
                 returnList.add(operation.state);
@@ -78,7 +73,6 @@ public class MainAutoTester {
     }
 
     public ArrayList<ArrayList<Boolean>> getMCDCTestRequirements(BranchPredicate bp) {
-
         ArrayList<ArrayList<Boolean>> returnList = new ArrayList<>();
 
         for (LogicOperation logicOperation : bp.logicOperations) {
@@ -119,33 +113,44 @@ public class MainAutoTester {
 
     public static void main(String[] args) {
         MainAutoTester m = new MainAutoTester();
+        Scanner dataScanner = new Scanner(System.in);
 
-        ArrayList<Operation> arrayOp1 = new ArrayList<>();
-        ArrayList<Operation> arrayOp2 = new ArrayList<>();
+        DataInitializer dataInitializer = new DataInitializer();
 
-        m.op1.state = false;
-        m.op2.state = true;
-        m.op3.state = true;
-        m.op4.state = true;
-        m.op5.state = true;
+        int programState = 0;
+        Function testMethod = null;
 
-        arrayOp1.add(m.op1);
-        arrayOp1.add(m.op2);
-        arrayOp2.add(m.op3);
-        arrayOp2.add(m.op4);
-        //arrayOp2.add(m.op5);
+        while (programState != -1) {
+            System.out.println("Available to test methods: ");
+            System.out.println("    1. Test method one");
+            System.out.println("    2. Triangle method");
+            System.out.print("Select method to test: ");
 
-        LogicOperation logicOperation1 = new LogicOperation(arrayOp1, LogicOperator.OR);
-        LogicOperation logicOperation2 = new LogicOperation(arrayOp2, LogicOperator.OR);
+            int selection = dataScanner.nextInt();
 
-        ArrayList<LogicOperation> logicOperations = new ArrayList<>();
-        logicOperations.add(logicOperation1);
-        logicOperations.add(logicOperation2);
+            switch (selection) {
+                case 1:
+                    testMethod = dataInitializer.initializeData1();
+                case 2:
+                    testMethod = dataInitializer.initializeData1();
+            }
 
-        BranchPredicate bp = new BranchPredicate(logicOperations, LogicOperator.AND);
+            System.out.println("Generating test requirements for each branch predicate...");
 
-        //System.out.println(m.calculateState(bp));
-        System.out.println(m.getMCDCTestRequirements(bp));
+            if (testMethod != null) {
+                for (BranchPredicate bp : testMethod.predicates) {
+                    System.out.println(m.getMCDCTestRequirements(bp));
+                }
+            }
+
+            System.out.println("Quit or continue? (type Q for quit or anything to continue)");
+            String qc = dataScanner.next();
+
+            if (qc.equalsIgnoreCase("q")) {
+                programState = -1;
+            }
+        }
+
     }
 
 }
