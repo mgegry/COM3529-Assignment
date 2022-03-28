@@ -2,8 +2,12 @@ public class TestMethods {
 
     /// COMPLICATED PREDICATE EXAMPLE
 
-    public static boolean test1(int a, int b, int c) {
+    public static boolean TestBranchPredicate1(int a, int b, int c) {
         return (a <= b && a <= c) || (a >= b && a >= c);
+    }
+
+    public static boolean TestBranchPredicate2(int a, int b, int c)  {
+        return true;
     }
 
 

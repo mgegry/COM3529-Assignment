@@ -18,14 +18,14 @@ public class DataInitializer {
         arrayOp2.add(op4);
         //arrayOp2.add(m.op5);
 
-        LogicOperation logicOperation1 = new LogicOperation(arrayOp1, LogicOperator.OR);
-        LogicOperation logicOperation2 = new LogicOperation(arrayOp2, LogicOperator.OR);
+        LogicOperation logicOperation1 = new LogicOperation(arrayOp1, LogicOperator.AND);
+        LogicOperation logicOperation2 = new LogicOperation(arrayOp2, LogicOperator.AND);
 
         ArrayList<LogicOperation> logicOperations = new ArrayList<>();
         logicOperations.add(logicOperation1);
         logicOperations.add(logicOperation2);
 
-        BranchPredicate bp = new BranchPredicate(logicOperations, LogicOperator.AND);
+        BranchPredicate bp = new BranchPredicate(logicOperations, LogicOperator.OR);
 
         ArrayList<BranchPredicate> predicates = new ArrayList<>();
         predicates.add(bp);
