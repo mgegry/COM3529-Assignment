@@ -44,8 +44,8 @@ public class DataInitializer {
 
     public Function initializeData3() {
         Operation op1 = new Operation("a", "b", Condition.LTOET);
-        Operation op2 = new Operation("a", "b", Condition.LTOET);
-        Operation op3 = new Operation("a", "b", Condition.LTOET);
+        Operation op2 = new Operation("c", "d", Condition.LTOET);
+        Operation op3 = new Operation("z", "v", Condition.LTOET);
 
         LogicOperation logicOperation1 = new LogicOperation(op1);
 
