@@ -3,7 +3,7 @@ import java.util.Random;
 
 public class EvaluationSubject {
 
-    static final int ITERATIONS = 0;
+    static final int ITERATIONS = 10000;
 
     public static boolean checkListUnique(ArrayList<ArrayList<Boolean>> checkList, ArrayList<Boolean> list) {
         for (ArrayList<Boolean> l : checkList) {
@@ -27,6 +27,16 @@ public class EvaluationSubject {
             result.add(r);
         }
 
+        /*
+        f t t f
+         x || (y && z)
+
+         t t t - t
+         f t t - t
+         f t f -
+         f f f - f
+         f f t -
+         */
         return (a <= b && a <= c) || (a >= b && a >= c);
     }
 

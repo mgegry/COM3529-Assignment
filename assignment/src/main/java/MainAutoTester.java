@@ -9,24 +9,47 @@ public class MainAutoTester {
     public boolean calculateState(BranchPredicate bp) {
         boolean result;
 
-        result = bp.mainOperator != LogicOperator.OR;
+        if (bp.logicOperations != null) {
+            result = bp.mainOperator != LogicOperator.OR;
+            for (LogicOperation logicOperation : bp.logicOperations) {
+                if (logicOperation.operations != null) {
+                    boolean x = logicOperation.operations.get(0).state;
 
-        for (LogicOperation logicOperation : bp.logicOperations) {
-            boolean x = logicOperation.operations.get(0).state;
+                    for (Operation operation : logicOperation.operations) {
+                        if (logicOperation.operator == LogicOperator.OR) {
+                            x = x || operation.state;
+                        } else if (logicOperation.operator == LogicOperator.AND) {
+                            x = x && operation.state;
+                        }
+                    }
 
-            for (Operation operation : logicOperation.operations) {
-                if (logicOperation.operator == LogicOperator.OR) {
-                    x = x || operation.state;
-                } else if (logicOperation.operator == LogicOperator.AND) {
-                    x = x && operation.state;
+
+                    if (bp.mainOperator == LogicOperator.OR) {
+                        result = result || x;
+                    } else if (bp.mainOperator == LogicOperator.AND) {
+                        result = result && x;
+                    }
+                } else {
+                    if (bp.mainOperator == LogicOperator.OR) {
+                        result = result || logicOperation.operation.state;
+                    } else if (bp.mainOperator == LogicOperator.AND) {
+                        result = result && logicOperation.operation.state;
+                    }
                 }
             }
+        } else {
+            if (bp.logicOperation.operations != null) {
+                result = bp.logicOperation.operations.get(0).state;
 
-
-            if (bp.mainOperator == LogicOperator.OR) {
-                result = result || x;
-            } else if (bp.mainOperator == LogicOperator.AND) {
-                result = result && x;
+                for(Operation operation : bp.logicOperation.operations) {
+                    if (bp.logicOperation.operator == LogicOperator.OR) {
+                        result = result || operation.state;
+                    } else if (bp.logicOperation.operator == LogicOperator.AND) {
+                        result = result && operation.state;
+                    }
+                }
+            } else {
+                result = bp.logicOperation.operation.state;
             }
         }
 
@@ -36,27 +59,47 @@ public class MainAutoTester {
     public void setStartingStateOperations(BranchPredicate bp) {
         boolean state = bp.mainOperator != LogicOperator.OR;
 
-        for (LogicOperation logicOperation : bp.logicOperations) {
-            for (Operation operation : logicOperation.operations)  {
-                operation.state = state;
+        if (bp.logicOperations != null) {
+            for (LogicOperation logicOperation : bp.logicOperations) {
+                if (logicOperation.operations != null) {
+                    for (Operation operation : logicOperation.operations) {
+                        operation.state = state;
+                    }
+                } else {
+                    logicOperation.operation.state = state;
+                }
+            }
+        } else {
+            if (bp.logicOperation.operations != null) {
+                for (Operation operation : bp.logicOperation.operations) {
+                    operation.state = state;
+                }
+            } else {
+                bp.logicOperation.operation.state = state;
             }
         }
-    }
-
-    public void printOperationsStatesBranch(BranchPredicate bp) {
-        for (LogicOperation logicOperation : bp.logicOperations) {
-            for (Operation operation : logicOperation.operations)  {
-                System.out.print(operation.state + " ");
-            }
-        }
-        System.out.println();
     }
 
     public ArrayList<Boolean> getOperationStates(BranchPredicate bp) {
         ArrayList<Boolean> returnList = new ArrayList<>();
-        for (LogicOperation logicOperation : bp.logicOperations) {
-            for (Operation operation : logicOperation.operations)  {
-                returnList.add(operation.state);
+        if (bp.logicOperations != null) {
+            for (LogicOperation logicOperation : bp.logicOperations) {
+
+                if (logicOperation.operations != null) {
+                    for (Operation operation : logicOperation.operations) {
+                        returnList.add(operation.state);
+                    }
+                } else {
+                    returnList.add(logicOperation.operation.state);
+                }
+            }
+        } else {
+            if (bp.logicOperation.operations != null) {
+                for (Operation operation : bp.logicOperation.operations) {
+                    returnList.add(operation.state);
+                }
+            } else {
+                returnList.add(bp.logicOperation.operation.state);
             }
         }
 
@@ -72,42 +115,112 @@ public class MainAutoTester {
         return true;
     }
 
-    public ArrayList<ArrayList<Boolean>> getMCDCTestRequirements(BranchPredicate bp) {
+    public ArrayList<ArrayList<Boolean>> getRestrictedMCDCTestRequirements(BranchPredicate bp) {
         ArrayList<ArrayList<Boolean>> returnList = new ArrayList<>();
 
-        for (LogicOperation logicOperation : bp.logicOperations) {
+        if (bp.logicOperations != null) {
+            setStartingStateOperations(bp);
 
-            boolean s = logicOperation.operator != LogicOperator.OR;
+            for (LogicOperation logicOperation : bp.logicOperations) {
 
-            for (Operation operation : logicOperation.operations) {
-                setStartingStateOperations(bp);
+                if (logicOperation.operations != null) {
+                    boolean s = logicOperation.operator != LogicOperator.OR;
 
-                for (Operation op : logicOperation.operations) {
-                    if (!operation.equals(op)) {
-                        op.state = s;
+                    for (Operation operation : logicOperation.operations) {
+                        setStartingStateOperations(bp);
+
+                        for (Operation op : logicOperation.operations) {
+                            if(!operation.equals(op)) {
+                                op.state = s;
+                            }
+                        }
+                        operation.state = !s;
+                        boolean result1 = calculateState(bp);
+
+                        operation.state = !operation.state;
+                        boolean result2 = calculateState(bp);
+
+                        if (result1 != result2) {
+                            operation.state = !s;
+                            ArrayList<Boolean> requirements = getOperationStates(bp);
+                            if (checkTestRequirementUnique(returnList, requirements)) {
+                                returnList.add(requirements);
+                            }
+                            operation.state = s;
+                            requirements = getOperationStates(bp);
+                            if (checkTestRequirementUnique(returnList, requirements)) {
+                                returnList.add(requirements);
+                            }
+                        }
                     }
-                }
+                } else {
 
-                operation.state = !s;
-                boolean result1 = calculateState(bp);
+                    boolean ss =  bp.mainOperator != LogicOperator.OR;
 
-                operation.state = !operation.state;
-                boolean result2 = calculateState(bp);
+                    logicOperation.operation.state = ss;
+                    boolean result1 = calculateState(bp);
 
-                if (result1 != result2) {
-                    operation.state = !s;
-                    ArrayList<Boolean> requirements = getOperationStates(bp);
-                    if (checkTestRequirementUnique(returnList, requirements)) {
-                        returnList.add(requirements);
+                    logicOperation.operation.state = !ss;
+                    boolean result2 = calculateState(bp);
+
+                    if (result1 != result2) {
+                        logicOperation.operation.state = ss;
+                        ArrayList<Boolean> requirements = getOperationStates(bp);
+                        if (checkTestRequirementUnique(returnList, requirements)) {
+                            returnList.add(requirements);
+                        }
+
+                        logicOperation.operation.state = !ss;
+                        requirements = getOperationStates(bp);
+                        if (checkTestRequirementUnique(returnList, requirements)) {
+                            returnList.add(requirements);
+                        }
                     }
-                    operation.state = s;
-                    requirements = getOperationStates(bp);
-                    if (checkTestRequirementUnique(returnList, requirements)) {
-                        returnList.add(requirements);
-                    }
+
+
                 }
             }
+        } else {
+            if (bp.logicOperation.operations != null) {
+                boolean s = bp.logicOperation.operator != LogicOperator.OR;
+
+                for (Operation operation : bp.logicOperation.operations) {
+                    setStartingStateOperations(bp);
+
+                    for (Operation op : bp.logicOperation.operations) {
+                        if(!operation.equals(op)) {
+                            op.state = s;
+                        }
+                    }
+                    operation.state = !s;
+                    boolean result1 = calculateState(bp);
+
+                    operation.state = !operation.state;
+                    boolean result2 = calculateState(bp);
+
+                    if (result1 != result2) {
+                        operation.state = !s;
+                        ArrayList<Boolean> requirements = getOperationStates(bp);
+                        if (checkTestRequirementUnique(returnList, requirements)) {
+                            returnList.add(requirements);
+                        }
+                        operation.state = s;
+                        requirements = getOperationStates(bp);
+                        if (checkTestRequirementUnique(returnList, requirements)) {
+                            returnList.add(requirements);
+                        }
+                    }
+                }
+            } else {
+                ArrayList<Boolean> requirements = new ArrayList<>();
+                requirements.add(true);
+                returnList.add(requirements);
+                ArrayList<Boolean> requirements2 = new ArrayList<>();
+                requirements2.add(false);
+                returnList.add(requirements2);
+            }
         }
+
         return returnList;
     }
 
@@ -131,15 +244,20 @@ public class MainAutoTester {
             switch (selection) {
                 case 1:
                     testMethod = dataInitializer.initializeData1();
+                    break;
                 case 2:
-                    testMethod = dataInitializer.initializeData1();
+                    testMethod = dataInitializer.initializeData2();
+                    break;
+                case 3:
+                    testMethod = dataInitializer.initializeData3();
+                    break;
             }
 
             System.out.println("Generating test requirements for each branch predicate...");
 
             if (testMethod != null) {
                 for (BranchPredicate bp : testMethod.predicates) {
-                    System.out.println(m.getMCDCTestRequirements(bp));
+                    System.out.println(m.getRestrictedMCDCTestRequirements(bp));
                 }
             }
 
