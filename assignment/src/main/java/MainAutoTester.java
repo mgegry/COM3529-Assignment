@@ -1,3 +1,10 @@
+/**
+ * This is the start class for the Software testing and Analysis
+ *
+ * @author  Mircea Gelu Egry
+ * @version 1.0
+ */
+
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -7,6 +14,10 @@ import java.io.IOException;
 
 public class MainAutoTester {
 
+    /**
+     * This is the main method
+     * @param args Unused
+     */
     public static void main(String[] args) {
 
         Scanner dataScanner = new Scanner(System.in);
@@ -30,6 +41,7 @@ public class MainAutoTester {
             boolean newFile = false;
             String inputFile = "";
 
+            // Create new file
             while (!newFile) {
                 inputFile = dataScanner.next();
                 inputFile = inputFile.substring(0, 1).toUpperCase() + inputFile.substring(1);
@@ -59,6 +71,7 @@ public class MainAutoTester {
             String fileHeader = "public class " + className + " {";
             fileHeader = fileHeader + "\n\tpublic static void generatedTests() {";
 
+            // Add header to the created file
             if (newFile) {
                 try {
                     Files.writeString(path, fileHeader, StandardOpenOption.APPEND);
@@ -72,6 +85,7 @@ public class MainAutoTester {
 
             int ok = 0;
 
+            /// Selecting method to test
             while (ok == 0) {
 
                 System.out.println("Available to test methods: ");

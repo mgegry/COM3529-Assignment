@@ -1,7 +1,19 @@
+/**
+ * This class responsibility is to initialize the functions
+ *
+ * @author  Mircea Gelu Egry
+ * @version 1.0
+ */
+
 import java.util.ArrayList;
 
 public class DataInitializer {
 
+
+    /**
+     * Initialize the data for the first method from TestMethods class
+     * @return the initialized function
+     */
     public Function initializeData1() {
         Operation op1 = new Operation("a", "b", Condition.LTOET);
         LogicOperation logicOperation = new LogicOperation(op1);
@@ -13,6 +25,10 @@ public class DataInitializer {
         return new Function(predicates);
     }
 
+    /**
+     * Initialize the data for the second method from TestMethods class
+     * @return the initialized function
+     */
     public Function initializeData2() {
         Operation op1 = new Operation("a", "b", Condition.LTOET);
         Operation op2 = new Operation("a", "c", Condition.GTOET);
@@ -31,6 +47,10 @@ public class DataInitializer {
         return new Function(predicates);
     }
 
+    /**
+     * Initialize the data for the third method from TestMethods class
+     * @return the initialized function
+     */
     public Function initializeData3() {
         Operation op1 = new Operation("a", "b", Condition.LTOET);
         Operation op2 = new Operation("a", "c", Condition.GTOET);

@@ -1,61 +1,47 @@
+/**
+ * This class holds the static definition of the methods under testing
+ *
+ * @author  Mircea Gelu Egry
+ * @version 1.0
+ */
+
 public class TestMethods {
 
     /// PREDICATE EXAMPLES
 
+    /**
+     * Check if a number is bigger than the other one
+     *
+     * @param a the first number
+     * @param b the second number
+     * @return true if a <= b otherwise false
+     */
     public static boolean checkIfNumberBigger(int a, int b) {
         return a <= b;
     }
 
+    /**
+     * Check if a number is between another two
+     *
+     * @param a the first number
+     * @param b the second number
+     * @param c the third number
+     * @return boolean if number in range or not
+     */
     public static boolean checkNumberInRange(int a, int b, int c)  {
         return a >= b && a <= c;
     }
 
+    /**
+     * Just a more complicated branch predicate to test
+     *
+     * @param a the first number
+     * @param b the second number
+     * @param c the third number
+     * @param d the fourth number
+     * @return boolean if logic expression is true or false
+     */
     public static boolean testBranchPredicate(int a, int b, int c, int d) {
         return (a <= b && a >= c) || (a <= d && a != 0);
-    }
-
-    /// TRIANGLE EXAMPLE
-
-    public enum Type {
-        INVALID,
-        SCALENE,
-        EQUILATERAL,
-        ISOSCELES;
-    }
-
-    public static Type classify(int side1, int side2, int side3) {
-        Type type;
-
-        if (side1 > side2) {
-            int temp = side1;
-            side1 = side2;
-            side2 = temp;
-        }
-        if (side1 > side3) {
-            int temp = side1;
-            side1 = side3;
-            side3 = temp;
-        }
-        if (side2 > side3) {
-            int temp = side2;
-            side2 = side3;
-            side3 = temp;
-        }
-
-        if (side1 + side2 <= side3) {
-            type = Type.INVALID;
-        } else {
-            type = Type.SCALENE;
-            if (side1 == side2) {
-                if (side2 == side3) {
-                    type = Type.EQUILATERAL;
-                }
-            } else {
-                if (side2 == side3) {
-                    type = Type.ISOSCELES;
-                }
-            }
-        }
-        return type;
     }
 }

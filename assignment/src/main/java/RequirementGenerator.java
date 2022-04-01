@@ -1,7 +1,20 @@
+/**
+ * This class holds generates the requirements for a given branch predicate
+ *
+ * @author  Mircea Gelu Egry
+ * @version 1.0
+ */
+
 import java.util.ArrayList;
 
 public class RequirementGenerator {
 
+    /**
+     * Calculate the branch predicate result based on the given states for the operations
+     *
+     * @param bp the branch predicate
+     * @return boolean containing the result of the branch predicate
+     */
     public boolean calculateState(BranchPredicate bp) {
         boolean result;
 
@@ -52,6 +65,10 @@ public class RequirementGenerator {
         return result;
     }
 
+    /**
+     * Set the starting states for the operations for the given branch predicate
+     * @param bp the branch predicate
+     */
     public void setStartingStateOperations(BranchPredicate bp) {
         boolean state = bp.mainOperator != LogicOperator.OR;
 
@@ -76,6 +93,12 @@ public class RequirementGenerator {
         }
     }
 
+    /**
+     * Get all the operation states as an array of booleans for the given branch predicate
+     *
+     * @param bp the branch predicate
+     * @return an array list of booleans containing the states of the operations
+     */
     public ArrayList<Boolean> getOperationStates(BranchPredicate bp) {
         ArrayList<Boolean> returnList = new ArrayList<>();
         if (bp.logicOperations != null) {
@@ -102,6 +125,13 @@ public class RequirementGenerator {
         return returnList;
     }
 
+    /**
+     * Checks that the given test requirements are unique in a list of test requirements
+     *
+     * @param checkList the list of test requirements
+     * @param list the list to be checked if unique
+     * @return boolean stating if list unique or not
+     */
     public boolean checkTestRequirementUnique(ArrayList<ArrayList<Boolean>> checkList, ArrayList<Boolean> list) {
         for (ArrayList<Boolean> l : checkList) {
             if (list.equals(l)) {
@@ -111,6 +141,12 @@ public class RequirementGenerator {
         return true;
     }
 
+    /**
+     * This method returns the restricted mcdc test requirements for the given branch predicate
+     *
+     * @param bp the branch predicate
+     * @return an array list of array lists of booleans containing the mcdc test requirements
+     */
     public ArrayList<ArrayList<Boolean>> getRestrictedMCDCTestRequirements(BranchPredicate bp) {
         ArrayList<ArrayList<Boolean>> returnList = new ArrayList<>();
 
