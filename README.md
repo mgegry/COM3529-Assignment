@@ -7,7 +7,7 @@ To install and run the program:
     1. Clone the repository on your machine
     2. Open the assignment project in Intellij Idea.
     3. Run MainAutoTester.java
-    4. The project has a console interface for to easy test the methods that I have created.
+    4. The project has a console interface to easy test the methods that I have created.
     
 To add your own test methods:
     1. Add your method as a static method in the TestMethod class
