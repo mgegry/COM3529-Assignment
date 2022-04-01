@@ -1,15 +1,18 @@
 public class TestMethods {
 
-    /// COMPLICATED PREDICATE EXAMPLE
+    /// PREDICATE EXAMPLES
 
-    public static boolean TestBranchPredicate1(int a, int b, int c) {
-        return (a <= b && a <= c) || (a >= b && a >= c);
+    public static boolean checkIfNumberBigger(int a, int b) {
+        return a <= b;
     }
 
-    public static boolean TestBranchPredicate2(int a, int b, int c)  {
-        return true;
+    public static boolean checkNumberInRange(int a, int b, int c)  {
+        return a >= b && a <= c;
     }
 
+    public static boolean testBranchPredicate(int a, int b, int c, int d) {
+        return (a <= b && a >= c) || (a <= d && a != 0);
+    }
 
     /// TRIANGLE EXAMPLE
 

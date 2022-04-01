@@ -1,44 +1,199 @@
+import java.nio.file.*;
+import java.util.ArrayList;
 import java.util.Scanner;
-
-// (a <= b && a <= c) || (a >= b && a >= c)
-// (a <= b && a <= c) || (a >= b && a >= c && a != 0)
+import java.io.File;
+import java.nio.file.Files;
+import java.io.IOException;
 
 public class MainAutoTester {
 
     public static void main(String[] args) {
-        RequirementGenerator requirementGenerator = new RequirementGenerator();
-        Scanner dataScanner = new Scanner(System.in);
 
+        Scanner dataScanner = new Scanner(System.in);
         DataInitializer dataInitializer = new DataInitializer();
+        RequirementGenerator requirementGenerator = new RequirementGenerator();
+        EvaluationSubject evaluationSubject = new EvaluationSubject();
+
+        ArrayList<ArrayList<Boolean>> requirements;
 
         int programState = 0;
-        Function testMethod = null;
+        Function testMethod;
+        EvaluationResult evaluationResult;
+
+        System.out.println("Software Testing Assignment - Mircea Egry\n");
 
         while (programState != -1) {
-            System.out.println("Available to test methods: ");
-            System.out.println("    1. Test method one");
-            System.out.println("    2. Triangle method");
-            System.out.print("Select method to test: ");
 
-            int selection = dataScanner.nextInt();
+            System.out.println("What is the file name you want to write your test to?");
+            System.out.print("Filename (please provide file extension \".java\"): ");
 
-            switch (selection) {
-                case 1:
-                    testMethod = dataInitializer.initializeData1();
-                    break;
-                case 2:
-                    testMethod = dataInitializer.initializeData2();
-                    break;
-                case 3:
-                    testMethod = dataInitializer.initializeData3();
-                    break;
+            boolean newFile = false;
+            String inputFile = "";
+
+            while (!newFile) {
+                inputFile = dataScanner.next();
+                inputFile = inputFile.substring(0, 1).toUpperCase() + inputFile.substring(1);
+                String createPath = "./src/test/java/" + File.separator + inputFile;
+
+                    try {
+                        File myObj = new File(createPath);
+
+                        if (myObj.createNewFile()) {
+                            System.out.println("File created: " + myObj.getName());
+                            newFile = true;
+                        } else {
+                            System.out.print("File already exists. Please create a new one!\nNew file name: ");
+                        }
+                    } catch (IOException e) {
+                        System.out.println("An error occurred.");
+                        e.printStackTrace();
+                        break;
+                    }
             }
 
-            System.out.println("Generating test requirements for each branch predicate...");
+            Path path = Paths.get("./src/test/java/" + inputFile);
 
-            if (testMethod != null) {
-                for (BranchPredicate bp : testMethod.predicates) {
-                    System.out.println(requirementGenerator.getRestrictedMCDCTestRequirements(bp));
+            String className = inputFile.replace(".java", "");
+            className = className.substring(0, 1).toUpperCase() + className.substring(1);
+
+            String fileHeader = "public class " + className + " {";
+            fileHeader = fileHeader + "\n\tpublic static void generatedTests() {";
+
+            if (newFile) {
+                try {
+                    Files.writeString(path, fileHeader, StandardOpenOption.APPEND);
+                } catch (IOException e) {
+                    System.out.println("Unable to write to file" + e.getLocalizedMessage());
+                    break;
+                }
+            }
+
+
+
+            int ok = 0;
+
+            while (ok == 0) {
+
+                System.out.println("Available to test methods: ");
+                System.out.println("    1. Test a less than or equal to b");
+                System.out.println("    2. Test number is in certain range");
+                System.out.println("    3. Test predicate: (a <= b && a >= c) || (a <= d && a != 0)");
+                System.out.print("Select method to test: ");
+
+                String selection = dataScanner.next();
+
+                switch (selection) {
+                    case "1":
+                        testMethod = dataInitializer.initializeData1();
+                        for (BranchPredicate bp : testMethod.predicates) {
+                            requirements = requirementGenerator.getRestrictedMCDCTestRequirements(bp);
+                            evaluationResult = evaluationSubject.generateTestInputValues(Integer.parseInt(selection));
+
+                            int i = 0;
+                            for(ArrayList<Boolean> result : evaluationResult.conditionResults) {
+                                for(ArrayList<Boolean> requirement : requirements) {
+                                    if (requirement.equals(result)) {
+                                        StringBuilder line = new StringBuilder("\n\t\tTestMethods.checkIfNumberBigger(");
+                                        int j = 0;
+                                        for(int x : evaluationResult.inputResults.get(i)) {
+                                            if(j != evaluationResult.inputResults.get(i).size() - 1) {
+                                                line.append(x).append(",");
+                                            } else {
+                                                line.append(x);
+                                            }
+                                            j++;
+                                        }
+                                        line.append(");");
+                                        try {
+                                            Files.writeString(path, line.toString(), StandardOpenOption.APPEND);
+                                        } catch (IOException e) {
+                                            System.out.println("Unable to write to file" + e.getLocalizedMessage());
+                                        }
+                                    }
+                                }
+                                i++;
+                            }
+                        }
+                        ok = 1;
+                        break;
+
+                    case "2":
+                        testMethod = dataInitializer.initializeData2();
+                        for (BranchPredicate bp : testMethod.predicates) {
+                            requirements = requirementGenerator.getRestrictedMCDCTestRequirements(bp);
+                            evaluationResult = evaluationSubject.generateTestInputValues(Integer.parseInt(selection));
+
+                            int i = 0;
+                            for(ArrayList<Boolean> result : evaluationResult.conditionResults) {
+                                for(ArrayList<Boolean> requirement : requirements) {
+                                    if (requirement.equals(result)) {
+                                        StringBuilder line = new StringBuilder("\n\t\tTestMethods.checkNumberInRange(");
+                                        int j = 0;
+                                        for (int x : evaluationResult.inputResults.get(i)) {
+                                            if (j != evaluationResult.inputResults.get(i).size() - 1) {
+                                                line.append(x).append(",");
+                                            } else {
+                                                line.append(x);
+                                            }
+                                            j++;
+                                        }
+                                        line.append(");");
+                                        try {
+                                            Files.writeString(path, line.toString(), StandardOpenOption.APPEND);
+                                        } catch (IOException e) {
+                                            System.out.println("Unable to write to file" + e.getLocalizedMessage());
+                                        }
+                                    }
+                                }
+                                i++;
+                            }
+                        }
+
+                        ok = 1;
+                        break;
+
+                    case "3":
+                        testMethod = dataInitializer.initializeData3();
+                        for (BranchPredicate bp : testMethod.predicates) {
+                            requirements = requirementGenerator.getRestrictedMCDCTestRequirements(bp);
+                            evaluationResult = evaluationSubject.generateTestInputValues(Integer.parseInt(selection));
+
+                            int i = 0;
+                            for(ArrayList<Boolean> result : evaluationResult.conditionResults) {
+                                for(ArrayList<Boolean> requirement : requirements) {
+                                    if (requirement.equals(result)) {
+                                        StringBuilder line = new StringBuilder("\n\t\tTestMethods.testBranchPredicate(");
+                                        int j = 0;
+                                        for (int x : evaluationResult.inputResults.get(i)) {
+                                            if (j != evaluationResult.inputResults.get(i).size() - 1) {
+                                                line.append(x).append(",");
+                                            } else {
+                                                line.append(x);
+                                            }
+                                            j++;
+                                        }
+                                        line.append(");");
+                                        try {
+                                            Files.writeString(path, line.toString(), StandardOpenOption.APPEND);
+                                        } catch (IOException e) {
+                                            System.out.println("Unable to write to file" + e.getLocalizedMessage());
+                                        }
+                                    }
+                                }
+                                i++;
+                            }
+                        }
+                        ok = 1;
+                        break;
+
+                    default:
+                        System.out.println("Please choose one of the above methods to test.");
+                }
+                try {
+                    Files.writeString(path, "\n\t}\n}", StandardOpenOption.APPEND);
+                } catch (IOException e) {
+                    System.out.println("Unable to write to file" + e.getLocalizedMessage());
+                    break;
                 }
             }
 
