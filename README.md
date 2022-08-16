@@ -1,6 +1,8 @@
 # COM3529-Assignment
 COM3529 Software Testing and Analysis Mircea Gelu Egry
 
+JUnit test generator for MCDC generated requirements based on a given predicate.
+
 The program was developed with the help of Intellij Idea IDE.
 
 To install and run the program:
